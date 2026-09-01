@@ -208,7 +208,7 @@ const drawInvoiceContent = async (doc, factura) => {
        .text('Esta factura ha sido generada por un sistema informático conforme al Reglamento de Facturación Electrónica (VeriFactu).', { width: 450 })
        .text(`Huella SHA-256: ${factura.hashActual || 'N/A'}`)
        .text(`Encadenamiento Anterior: ${factura.hashCadenaAnterior || 'Registro Inicial'}`)
-       .text(`Software: ${factura.sifNombre || 'Win o Win Facturación'} v${factura.sifVersion || '1.0'} | NIF Desarrollador: ${factura.sifNif || 'N/A'}`);
+       .text(`Software: ${factura.sifNombre || 'VeriFactu App'} v${factura.sifVersion || '1.0'} | NIF Desarrollador: ${factura.sifNif || 'N/A'}`);
 
     doc.end();
 };

@@ -1,106 +1,123 @@
-# Win o Win Facturación - Sistema Veri*Factu 🏆
+# VeriFactu Desktop - Sistema de Facturación Electrónica ⚡
 
-Sistema integral de facturación electrónica orientado a la normativa española **Veri*Factu** (RD 1007/2023), diseñado específicamente para **Win o Win Consulting**.
-
-![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)
+![Version](https://img.shields.io/badge/version-1.1.0-blue.svg)
 ![Electron](https://img.shields.io/badge/platform-Electron-47848F.svg)
+![Node.js](https://img.shields.io/badge/backend-Express-000000.svg)
 ![Prisma](https://img.shields.io/badge/ORM-Prisma-2D3748.svg)
+![SQLite](https://img.shields.io/badge/database-SQLite-003B57.svg)
 ![License](https://img.shields.io/badge/license-MIT-green.svg)
+
+Sistema de escritorio completo para la gestión de facturación electrónica en España, diseñado en estricta conformidad con la normativa **Veri*Factu** (Real Decreto 1007/2023).
+
+---
 
 ## 📋 Descripción
 
-Esta aplicación de escritorio permite la gestión completa del ciclo de facturación, garantizando la integridad, conservación, accesibilidad, legibilidad, trazabilidad e inalterabilidad de los registros (requisitos Veri*Factu). Incluye generación de facturas rectificativas, gestión de clientes, perfiles de emisor y encadenamiento de hashes para auditoría legal.
+Esta aplicación ofrece una solución integral de escritorio que garantiza la **integridad, conservación, accesibilidad, legibilidad, trazabilidad e inalterabilidad** de los registros de facturación exigidos por la Agencia Tributaria (AEAT).
+
+Implementa un ciclo de vida completo de facturación (facturas ordinarias, simplificadas y rectificativas), encadenamiento inalterable de *hashes*, registro de auditoría (Audit Log), firma de documentos XML (XAdES-EPES), generación de documentos PDF con código QR obligatorio y envío automatizado por correo electrónico.
+
+---
 
 ## ✨ Características Principales
 
-- **Gestión de Facturación**: Creación de facturas ordinarias, simplificadas y rectificativas.
-- **Cumplimiento Veri*Factu**: Sistema de encadenamiento de hashes, registros de eventos inalterables y trazabilidad completa.
-- **Generación de PDFs**: Diseño profesional con códigos QR obligatorios y firmas digitales.
-- **Gestión de Clientes y Emisor**: Directorio completo de clientes y configuración detallada del perfil fiscal del emisor.
-- **Series de Facturación**: Soporte para múltiples series con contadores independientes.
-- **Seguridad**: Cifrado AES-256-GCM para credenciales SMTP y hashing de contraseñas.
-- **Auto-Migración**: El sistema detecta y actualiza la estructura de la base de datos automáticamente al iniciar.
-- **Envío por Email**: Integración con SMTP para el envío automatizado de facturas a clientes.
+- 🧾 **Ciclo de Facturación Completo**: Emisión de facturas ordinarias, rectificativas por sustitución/diferencia y simplificadas.
+- 🔗 **Garantía Veri*Factu (Encadenamiento Hash)**: Implementación de encadenamiento SHA-256 entre facturas consecutivas para evitar la alteración o inserción retroactiva de registros.
+- 📑 **Generación de PDFs con QR**: Generación dinámica de facturas en PDF con el código QR normativo y resumen de firma digital.
+- 🔐 **Seguridad & Privacidad**: Cifrado AES-256-GCM para credenciales SMTP y sensibles, contraseñas protegidas mediante Bcrypt y almacenamiento local en SQLite.
+- 📜 **Log de Auditoría (Audit Log)**: Registro inalterable de todos los eventos del ciclo de vida de las facturas para cumplimiento legal.
+- 👤 **Gestión de Emisor y Clientes**: Directorio de clientes con validación fiscal (NIF/CIF) y configuración del perfil emisor.
+- ✉️ **Envío Automático por Email**: Integración SMTP para enviar facturas y recibos directamente a los clientes.
+- 🧪 **Suite de Tests E2E**: Batería de pruebas automatizadas con **Playwright** para validar flujos críticos e integridad de datos.
+
+---
 
 ## 🚀 Tecnologías Utilizadas
 
-### Core
-- **Electron**: Framework para la aplicación de escritorio nativa.
-- **Node.js & Express**: Servidor API local para la lógica de negocio.
-- **Prisma ORM**: Gestión de la base de datos SQLite.
-- **SQLite**: Motor de base de datos ligero y local.
+### Core & Backend
+- **Electron**: Entorno ejecutable de escritorio nativo multiplataforma.
+- **Node.js & Express**: Servidor API REST local de alto rendimiento.
+- **Prisma ORM**: Modelado y gestión de la base de datos relacional.
+- **SQLite**: Motor de base de datos ultraligero y local.
 
-### Librerías Clave
-- **PDFKit**: Generación dinámica de documentos PDF.
-- **XML-Crypto**: Firma digital de ficheros XML para la AEAT.
-- **Nodemailer**: Gestión de envíos de correo electrónico.
-- **Zod / Joi**: Validación rigurosa de esquemas de datos.
-- **Bcryptjs**: Seguridad en el almacenamiento de credenciales.
+### Librerías & Utilidades
+- **PDFKit**: Renderizado dinámico de archivos PDF.
+- **XML-Crypto / Node-Forge**: Firma digital XAdES-EPES y gestión de certificados digitales.
+- **Zod & Joi**: Validación estricta de esquemas de datos y peticiones.
+- **Nodemailer**: Motor de envío de correos electrónicos.
+- **Playwright**: Automatización de pruebas end-to-end (E2E).
+
+---
 
 ## 📂 Estructura del Proyecto
 
 ```text
 facturacion/
-├── prisma/             # Esquema de base de datos y migraciones
-├── public/             # Interfaz de usuario (HTML, CSS, JS)
 ├── src/
-│   ├── main.js         # Proceso principal de Electron
-│   ├── server.js       # Configuración del servidor Express
-│   ├── controllers/    # Lógica de las rutas API
-│   ├── services/       # Servicios (Veri*Factu, PDF, Email, Auth)
-│   ├── models/         # Interacción con la DB vía Prisma
-│   ├── middleware/     # Seguridad y validación
-│   ├── utils/          # Utilidades generales y cifrado
-│   └── preload.js      # Puente de seguridad Electron (IPC)
-├── build/              # Recursos para el empaquetado
-├── dist/               # Instaladores generados (.exe)
-└── package.json        # Dependencias y scripts
+│   ├── main.js           # Proceso principal de Electron e IPC
+│   ├── server.js         # Inicialización de la API REST local
+│   ├── app.js            # Configuración de Express y middlewares
+│   ├── controllers/      # Controladores (Facturas, Clientes, Auth, PDF)
+│   ├── services/         # Servicios de negocio (Veri*Factu, PDF, XML, Email)
+│   ├── middleware/       # Validación y seguridad
+│   └── utils/            # Utilidades de cifrado y validaciones
+├── public/               # Frontend de la aplicación (HTML5, CSS3, JS Vanilla)
+├── prisma/               # Esquemas de base de datos y migraciones
+├── scripts/              # Scripts auxiliares de generación y utilidades
+├── tests/                # Pruebas unitarias y de integración E2E (Playwright)
+├── package.json          # Dependencias del proyecto y scripts
+└── README.md             # Documentación principal
 ```
 
-## ⚙️ Configuración e Instalación
+---
+
+## ⚙️ Instalación y Configuración
 
 ### Requisitos Previos
-- Node.js (v18 o superior)
-- npm o yarn
+- **Node.js** (v18.0.0 o superior)
+- **npm** (v9.0.0 o superior)
 
-### Instalación
-1. Clonar el repositorio.
-2. Instalar dependencias:
+### Pasos de Configuración
+
+1. **Clonar el repositorio:**
+   ```bash
+   git clone https://github.com/SergioPaton/winowin-facturacion.git
+   cd winowin-facturacion
+   ```
+
+2. **Instalar dependencias:**
    ```bash
    npm install
    ```
-3. Configurar el archivo `.env` (copiar el ejemplo si existe).
-4. Inicializar la base de datos:
+
+3. **Configurar el archivo de entorno:**
+   Copiar la plantilla `.env.example` a `.env`:
+   ```bash
+   cp .env.example .env
+   ```
+
+4. **Inicializar la base de datos:**
    ```bash
    npx prisma generate
    npx prisma db push
    ```
 
-### Ejecución en Desarrollo
-Para lanzar la aplicación Electron con recarga en caliente:
-```bash
-npm run electron:dev
-```
-
-## 📦 Empaquetado (Producción)
-
-Para generar el instalador ejecutable para Windows (`.exe`):
-```bash
-npm run electron:build
-```
-El instalador se generará en la carpeta `dist/`.
-
-## 🛡️ Detalles de Cumplimiento Veri*Factu
-
-El sistema implementa las siguientes medidas técnicas para cumplir estrictamente con el **RD 1007/2023** y la **Orden HFP/1177/2024**:
-
-1. **Encadenamiento (Hash Chaining)**: Cada factura incluye el hash de la factura anterior, creando una cadena irrompible que garantiza que no se han insertado ni borrado registros.
-2. **Registro de Auditoría (Audit Log)**: Implementado en `eventLog.service.js`, registra de forma inalterable cualquier evento crítico del ciclo de vida de la factura.
-3. **Firma XAdES-EPES**: Soporte para firmas electrónicas avanzadas mediante `xades.service.js`, asegurando la autenticidad y el no repudio.
-4. **Generación XML Veri*Factu**: Exportación automatizada de los registros de facturación en el formato XML estándar requerido por la AEAT.
-5. **Código QR Obligatorio**: Inclusión de códigos QR en todos los PDFs generados, permitiendo la verificación inmediata por parte del destinatario.
-6. **Resiliencia y Auto-Curación**: Scripts integrados para la reconstrucción de la cadena de hashes y validación de integridad en cada arranque.
-
+5. **Iniciar en modo desarrollo:**
+   ```bash
+   npm run electron:dev
+   ```
 
 ---
-> **Nota**: Este software ha sido desarrollado específicamente para **Win o Win Consulting** y cumple con los estándares actuales de la AEAT para sistemas de facturación verificables.
+
+## 🛡️ Detalles Técnicos de Cumplimiento (Veri*Factu - RD 1007/2023)
+
+1. **Hash Chaining**: Cada registro almacena `hash_anterior` y `hash_actual` calculados mediante algoritmos estándar SHA-256.
+2. **Respuesta XML**: Generación de estructuras de datos XML en conformidad con los esquemas oficiales de la AEAT.
+3. **Código QR Normativo**: Inclusión de URLs y códigos de verificación en la representación impresa (PDF).
+4. **Verificación de Integridad**: Detección de brechas en la secuencia de facturas o alteración no autorizada de registros.
+
+---
+
+## 📄 Licencia
+
+Este proyecto está distribuido bajo la licencia **MIT**. Consulta el archivo `LICENSE` para más detalles.

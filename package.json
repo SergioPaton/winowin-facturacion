@@ -1,7 +1,7 @@
 {
-  "name": "winowin-facturacion",
+  "name": "verifactu-facturacion",
   "version": "1.1.0",
-  "description": "Sistema de facturación VeriFactu para Win o Win Consulting.",
+  "description": "Sistema de facturación electrónica de escritorio Veri*Factu (RD 1007/2023) desarrollado con Electron, Express, Prisma y SQLite.",
   "main": "src/main.js",
   "scripts": {
     "dev": "node src/server.js",
@@ -44,8 +44,8 @@
     "prisma": "^5.22.0"
   },
   "build": {
-    "appId": "com.winowin.facturacion",
-    "productName": "Win o Win Facturación",
+    "appId": "com.verifactu.facturacion",
+    "productName": "VeriFactu Facturación",
     "directories": {
       "output": "dist"
     },

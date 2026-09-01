@@ -323,22 +323,22 @@ class EmisorService {
             
             if (emisoresCount === 0) {
                 const emisorPorDefecto = await this.createEmisor({
-                    nombre: 'Hermanos Gómez Win S.L.',
-                    nif: 'B75700476',
+                    nombre: 'Empresa Demo S.L.',
+                    nif: 'B12345678',
                     regimenFiscal: '01',
-                    direccion: 'C/ Islas Galápagos, 36 Bajo',
-                    ciudad: 'Aranjuez',
+                    direccion: 'Calle Principal 1',
+                    ciudad: 'Madrid',
                     provincia: 'Madrid',
-                    cp: '28300',
+                    cp: '28001',
                     pais: 'ES',
-                    telefono: '+34 698 764 889 /+34 637 572 723',
-                    email: 'winowinconsulting@gmail.com',
-                    web: 'https://www.winowin.consulting',
+                    telefono: '+34 910 000 000',
+                    email: 'contacto@ejemplo.com',
+                    web: 'https://www.ejemplo.com',
                     ivaPorDefecto: 21,
                     metodoPagoPorDefecto: '02',
-                    sifNombre: 'Win o Win Facturación',
+                    sifNombre: 'VeriFactu App',
                     sifVersion: '1.0.0',
-                    sifNif: 'B75700476', // CIF del emisor como responsable por defecto
+                    sifNif: 'B12345678',
                     activo: true
                 });
 

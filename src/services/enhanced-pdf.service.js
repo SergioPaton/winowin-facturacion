@@ -41,7 +41,7 @@ function drawFooter(doc, factura, colors, fonts) {
        .text('Esta factura ha sido generada por un sistema informático conforme al Reglamento de Facturación Electrónica (VeriFactu).', { width: 450 })
        .text(`Huella SHA-256: ${factura.hashActual || 'N/A'}`)
        .text(`Encadenamiento Anterior: ${factura.hashCadenaAnterior || 'Registro Inicial'}`)
-       .text(`Software: ${factura.sifNombre || 'Win o Win Facturación'} v${factura.sifVersion || '1.0'} | NIF Desarrollador: ${factura.sifNif || 'N/A'}`);
+       .text(`Software: ${factura.sifNombre || 'VeriFactu App'} v${factura.sifVersion || '1.0'} | NIF Desarrollador: ${factura.sifNif || 'N/A'}`);
 }
 
 /**
@@ -176,9 +176,9 @@ class EnhancedPDFService {
                 size: 'A4',
                 info: {
                     Title: 'Factura Electrónica',
-                    Author: 'Win o Win Facturación',
+                    Author: 'VeriFactu Desktop App',
                     Subject: 'Factura VeriFactu',
-                    Creator: 'Win o Win Facturación Enhanced PDF Service',
+                    Creator: 'VeriFactu Enhanced PDF Service',
                     Producer: 'PDFKit'
                 }
             },
@@ -188,9 +188,9 @@ class EnhancedPDFService {
                 compress: false,
                 info: {
                     Title: 'Factura Electrónica (Alta Calidad)',
-                    Author: 'Win o Win Facturación',
+                    Author: 'VeriFactu Desktop App',
                     Subject: 'Factura VeriFactu - Alta Calidad',
-                    Creator: 'Win o Win Facturación Enhanced PDF Service',
+                    Creator: 'VeriFactu Enhanced PDF Service',
                     Producer: 'PDFKit',
                     Keywords: 'factura, verifactu, electronica, pdf'
                 }
@@ -201,9 +201,9 @@ class EnhancedPDFService {
                 compress: false,
                 info: {
                     Title: 'Factura Electrónica (Versión Impresión)',
-                    Author: 'Win o Win Facturación',
+                    Author: 'VeriFactu Desktop App',
                     Subject: 'Factura VeriFactu - Versión para Impresión',
-                    Creator: 'Win o Win Facturación Enhanced PDF Service',
+                    Creator: 'VeriFactu Enhanced PDF Service',
                     Producer: 'PDFKit'
                 }
             }

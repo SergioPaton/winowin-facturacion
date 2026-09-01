@@ -1,9 +1,0 @@
-- [x] Generar certificado digital de prueba (.p12) usando node-forge
-- [x] Configurar archivo `.env` para la API `winowin/facturación`
-- [/] Iniciar la API backend de facturación
-- [ ] Configurar n8n:
-    - [ ] Descargar modelo `llama3.1` en Ollama
-    - [ ] Crear workflow con AI Agent
-    - [ ] Definir herramientas (tools) para interactuar con la API
-- [ ] Realizar prueba de emisión de factura con el Agente
-- [ ] Verificar generación de PDF y XML compliant

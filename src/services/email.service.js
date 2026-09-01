@@ -89,7 +89,7 @@ async function _createTransporter() {
     if (process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS) {
         return {
             isTest: false,
-            fromAddress: `"Win o Win Facturación" <${process.env.SMTP_USER}>`,
+            fromAddress: `"Facturación VeriFactu" <${process.env.SMTP_USER}>`,
             transporter: nodemailer.createTransport({
                 host: process.env.SMTP_HOST,
                 port: parseInt(process.env.SMTP_PORT) || 587,

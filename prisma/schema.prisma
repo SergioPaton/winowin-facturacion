@@ -1,0 +1,194 @@
+generator client {
+  provider   = "prisma-client-js"
+  engineType = "library"
+  output     = "../prisma-client"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model cliente {
+  id               Int       @id @default(autoincrement())
+  tipoCliente      String    @default("EMPRESA")
+  nombre           String
+  razonSocial      String?
+  nif              String    @unique(map: "Cliente_nif_key")
+  direccion        String?
+  codigoPostal     String?
+  ciudad           String?
+  provincia        String?
+  pais             String?   @default("España")
+  email            String?
+  telefono         String?
+  direccionEntrega String?
+  observaciones    String?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @default(now()) @updatedAt
+  factura          factura[]
+}
+
+model factura {
+  id                 Int            @id @default(autoincrement())
+  numero             String         @unique(map: "Factura_numero_key")
+  fechaEmision       DateTime
+  fechaOperacion     DateTime?
+  estado             String         @default("EMITIDA")
+  baseImponible      Decimal
+  ivaImporte         Decimal
+  irpfPorcentaje     Decimal?
+  irpfImporte        Decimal?
+  total              Decimal
+  datosFiscales      String
+  detallesNormativa  String?
+  hashCadenaAnterior String?
+  hashActual         String?
+  xmlFirmadoPath     String?
+  xmlFirmado         String?
+  fechaHoraHitoGen   DateTime?
+  sifNombre          String?
+  sifVersion         String?
+  sifNif             String?
+  aeatEstado         String         @default("PENDIENTE")
+  aeatCsv            String?
+  aeatError          String?
+  aeatEstadoAnulacion String?
+  aeatCsvAnulacion    String?
+  tipoFactura        String         @default("F1")
+  facturaRectificadaId Int?
+  createdAt          DateTime       @default(now())
+  updatedAt          DateTime       @updatedAt
+  descuento          Decimal?
+  notas              String?
+  metodoPago         String?
+  pagada             Boolean        @default(false)
+  importePagado      Decimal        @default(0.00)
+  cuentaBancaria     String?
+  clienteId          Int
+  serieId            Int?
+  serie              serie?         @relation(fields: [serieId], references: [id])
+  emisorId           Int
+  emisor             emisor         @relation(fields: [emisorId], references: [id])
+  cliente            cliente        @relation(fields: [clienteId], references: [id])
+  facturalinea       facturalinea[]
+}
+
+model facturalinea {
+  id             Int      @id @default(autoincrement())
+  descripcion    String
+  cantidad       Int
+  precioUnitario Decimal
+  tipoIva        Decimal
+  importe        Decimal
+  facturaId      Int
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  factura        factura  @relation(fields: [facturaId], references: [id])
+}
+
+model emisor {
+  id                      Int       @id @default(autoincrement())
+  nombre                  String
+  nif                     String    @unique(map: "Emisor_nif_key")
+  regimenFiscal           String    @default("01")
+  direccion               String
+  ciudad                  String
+  provincia               String
+  cp                      String
+  pais                    String    @default("ES")
+  telefono                String?
+  email                   String?
+  web                     String?
+  sifNombre               String    @default("SPG Facturación")
+  sifVersion              String    @default("1.0.0")
+  sifNif                  String    @default("B12345678")
+  // Campos adicionales del productor según RD 1007/2023
+  productorNombre          String?   // Nombre completo del productor
+  productorDireccion       String?   // Dirección del productor
+  productorLocalidad       String?   // Localidad del productor
+  productorProvincia       String?   // Provincia del productor
+  productorCp             String?   // Código postal del productor
+  productorPais           String?   @default("España") // País del productor
+  productorEmail          String?   // Email de contacto del productor
+  productorTelefono        String?   // Teléfono del productor
+  metodoPagoPorDefecto    String    @default("02")
+  ivaPorDefecto           Decimal   @default(21.00)
+  emailEnvioPorDefecto    Boolean   @default(false)
+  emailPlantilla          String?
+  // Configuración SMTP para envío de facturas
+  smtpHost                String?
+  smtpPort                Int?      @default(587)
+  smtpUser                String?
+  smtpPass                String?   // Cifrado AES-256-GCM
+  smtpFromName            String?
+  smtpSecure              Boolean   @default(false)
+  certificadoPath         String?
+  certificadoPassword     String?
+  backupAutomatico        Boolean   @default(true)
+  backupPath              String?
+  backupFrecuencia        String    @default("semanal")
+  observacionesPorDefecto String?
+  pieDePagina             String?
+  verifactuEnabled        Boolean   @default(true)
+  activo                  Boolean   @default(true)
+  createdAt               DateTime  @default(now())
+  updatedAt               DateTime  @updatedAt
+  factura                 factura[]
+  series                  serie[]
+}
+
+model serie {
+  id              Int       @id @default(autoincrement())
+  nombre          String
+  prefijo         String
+  proximoNumero   Int       @default(1)
+  descripcion     String?
+  tipo            String    @default("ORDINARIA") // ORDINARIA, RECTIFICATIVA
+  activo          Boolean   @default(true)
+  emisorId        Int
+  emisor          emisor    @relation(fields: [emisorId], references: [id])
+  facturas        factura[]
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+}
+
+model usuario {
+  id                  Int       @id @default(autoincrement())
+  nombre              String
+  apellido            String
+  telefono            Int
+  nif                 String    @unique(map: "Usuario_nif_key")
+  direccion           String
+  email               String    @unique(map: "Usuario_email_key")
+  nombreComercial     String?
+  prefijoFactura      String    @default("FACT-")
+  siguienteNumero     Int       @default(1)
+  ivaDefecto          Decimal   @default(21.00)
+  irpfDefecto         Decimal?
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+  verifactuEnabled    Boolean   @default(false)
+  certPath            String?
+  website             String?
+  cuentaBancaria      String?
+  nombreMarca         String?
+  logoPath            String?
+  passwordHash        String?
+  recoveryEmail       String?
+  username            String?   @unique
+  recoveryCode        String?
+  recoveryCodeExpires DateTime?
+}
+
+model eventoLog {
+  id          Int      @id @default(autoincrement())
+  fechaHora   DateTime @default(now())
+  tipo        String   // ALTA, BAJA, MODIFICACION, INICIO, CIERRE, BACKUP, ERROR
+  descripcion String
+  datos       String?  // JSON string con detalles adicionales
+  usuarioId   Int?     // Referencia opcional al usuario que generó el evento
+  hashAnterior String?  // Hash del evento anterior para encadenamiento
+  hashActual   String?  // Hash de este evento (Incluye todos los campos anteriores + hashAnterior)
+  createdAt   DateTime @default(now())
+}

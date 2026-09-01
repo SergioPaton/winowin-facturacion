@@ -1,0 +1,1229 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Win o Win Facturación | Gestión Premium</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div id="loader" class="loader-container hidden">
+        <div class="spinner"></div>
+    </div>
+
+    <div id="toast-container"></div>
+
+    <div class="bg-decoration">
+        <div class="circle circle-1"></div>
+        <div class="circle circle-2"></div>
+        <div class="circle circle-3"></div>
+    </div>
+
+    <!-- Sección de Configuración Inicial (First Boot) -->
+    <section id="setup-section" class="auth-container hidden">
+        <div class="glass-card auth-card">
+            <div class="logo">
+                <i class="fas fa-user-shield"></i>
+                <h1>Win o Win <span>Setup</span></h1>
+            </div>
+            <p class="subtitle">Configura tus credenciales locales iniciales</p>
+            
+            <form id="setup-form">
+                <div class="form-group">
+                    <label for="setup-username">Usuario</label>
+                    <div class="input-wrapper">
+                        <i class="fas fa-user"></i>
+                        <input type="text" id="setup-username" placeholder="Nombre de usuario" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="setup-password">Contraseña</label>
+                    <div class="input-wrapper">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="setup-password" placeholder="••••••••" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="setup-email">Email de Recuperación</label>
+                    <div class="input-wrapper">
+                        <i class="fas fa-envelope"></i>
+                        <input type="email" id="setup-email" placeholder="ejemplo@correo.com" required>
+                    </div>
+                    <small style="color:var(--text-muted);font-size:0.8rem;">Para recuperar acceso si olvidas la contraseña local</small>
+                </div>
+                <button type="submit" class="btn btn-primary">
+                    <span>Guardar y Entrar</span>
+                    <i class="fas fa-arrow-right"></i>
+                </button>
+            </form>
+        </div>
+    </section>
+
+    <!-- Sección de Autenticación -->
+    <section id="auth-section" class="auth-container">
+        <div class="glass-card auth-card">
+            <div class="logo">
+                <i class="fas fa-file-invoice-dollar"></i>
+                <h1>Win o Win <span>Facturación</span></h1>
+            </div>
+            <p class="subtitle">Accede a tu panel de gestión</p>
+            
+            <form id="login-form">
+                <div class="form-group">
+                    <label for="login-username">Usuario</label>
+                    <div class="input-wrapper">
+                        <i class="fas fa-user"></i>
+                        <input type="text" id="login-username" placeholder="Tu usuario" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="login-password">Contraseña</label>
+                    <div class="input-wrapper">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="login-password" placeholder="••••••••" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label style="display: flex; align-items: center; gap: 8px; font-size: 0.9rem;">
+                        <input type="checkbox" id="remember-session">
+                        Recordar sesión (7 días)
+                    </label>
+                </div>
+                <button type="submit" class="btn btn-primary">
+                    <span>Iniciar Sesión</span>
+                    <i class="fas fa-arrow-right"></i>
+                </button>
+            </form>
+            
+            <div class="auth-footer">
+                <p>¿Olvidaste tu contraseña? <a href="#" id="show-recovery">Recuperar cuenta</a></p>
+                <p>Uso exclusivo local</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Sección de Recuperación de Contraseña -->
+    <section id="recovery-section" class="auth-container hidden">
+        <div class="glass-card auth-card" style="position:relative;">
+            <button id="btn-back-to-login" style="position:absolute; top: 20px; left: 20px; background:none; color:var(--text); border:none; font-size:1.5rem; cursor:pointer; padding:5px;"><i class="fas fa-arrow-left"></i></button>
+            <div class="logo">
+                <i class="fas fa-life-ring"></i>
+                <h1>Recuperación</h1>
+            </div>
+            
+            <!-- Paso 1: Pedir Usuario -->
+            <div id="recovery-step-1">
+                <p class="subtitle">Introduce tu usuario para enviarte un código.</p>
+                <form id="recovery-form-1">
+                    <div class="form-group">
+                        <label for="recovery-username">Usuario</label>
+                        <div class="input-wrapper">
+                            <i class="fas fa-user"></i>
+                            <input type="text" id="recovery-username" placeholder="Tu usuario" required>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Enviar Código</button>
+                </form>
+            </div>
+
+            <!-- Paso 2: Pedir Código -->
+            <div id="recovery-step-2" class="hidden">
+                <p class="subtitle" id="recovery-email-hint">Introduce el código de 6 dígitos enviado a tu correo.</p>
+                <form id="recovery-form-2">
+                    <div class="form-group">
+                        <label for="recovery-code">Código (6 dígitos)</label>
+                        <div class="input-wrapper">
+                            <i class="fas fa-key"></i>
+                            <input type="text" id="recovery-code" placeholder="123456" maxlength="6" required>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Verificar Código</button>
+                </form>
+            </div>
+
+            <!-- Paso 3: Nueva Contraseña -->
+            <div id="recovery-step-3" class="hidden">
+                <p class="subtitle">Introduce tu nueva contraseña.</p>
+                <form id="recovery-form-3">
+                    <div class="form-group">
+                        <label for="recovery-new-password">Nueva Contraseña</label>
+                        <div class="input-wrapper">
+                            <i class="fas fa-lock"></i>
+                            <input type="password" id="recovery-new-password" placeholder="••••••••" required>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Restablecer Contraseña</button>
+                </form>
+            </div>
+
+            <div id="recovery-test-url" class="hidden" style="margin-top:20px; font-size:0.8rem; background:rgba(0,0,0,0.1); padding:10px; border-radius:5px;">
+                <p><strong>[DEV MODE] Correo simulado:</strong></p>
+                <a id="recovery-test-link" href="#" target="_blank" style="color:var(--primary); word-break:break-all;">Abrir previsualización</a>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- App Principal (Dashboard) -->
+    <section id="app-section" class="app-container hidden">
+        <aside class="sidebar glass-card">
+            <div class="sidebar-header">
+                <div class="logo-small">
+                    <i class="fas fa-file-invoice-dollar"></i>
+                    <h2>Win o Win</h2>
+                </div>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="#" class="nav-item active" data-view="dashboard">
+                    <i class="fas fa-th-large"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="#" class="nav-item" data-view="invoices">
+                    <i class="fas fa-file-invoice"></i>
+                    <span>Facturas</span>
+                </a>
+                <a href="#" class="nav-item" data-view="clients">
+                    <i class="fas fa-users"></i>
+                    <span>Clientes</span>
+                </a>
+                <a href="#" class="nav-item" data-view="emisor">
+                    <i class="fas fa-building"></i>
+                    <span>Perfil Emisor</span>
+                </a>
+                <a href="#" class="nav-item" data-view="reports">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Informes</span>
+                </a>
+                <a href="#" class="nav-item" data-view="audit">
+                    <i class="fas fa-history"></i>
+                    <span>Auditoría</span>
+                </a>
+                <a href="#" class="nav-item" data-view="settings">
+                    <i class="fas fa-cog"></i>
+                    <span>Configuración</span>
+                </a>
+            </nav>
+            <div class="sidebar-footer">
+                <button id="theme-toggle" class="btn btn-secondary btn-sm" title="Cambiar Tema" style="margin-bottom: 10px; width: 100%; justify-content: flex-start; padding-left: 15px;">
+                    <i class="fas fa-moon"></i>
+                    <span>Modo Claro</span>
+                </button>
+                <button id="logout-btn" class="btn btn-logout">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Cerrar Sesión</span>
+                </button>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <header class="top-bar">
+                <div class="search-bar">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="global-search" placeholder="Buscar facturas, clientes...">
+                </div>
+                <div class="user-info">
+                    <span id="user-display-name">Usuario</span>
+                    <div class="user-avatar" id="user-avatar-initials">U</div>
+                </div>
+            </header>
+
+            <div id="view-dashboard" class="content-view">
+                <div class="welcome-header">
+                    <h1>Hola, <span id="welcome-name">Usuario</span> 👋</h1>
+                    <p>Aquí tienes un resumen de tu actividad.</p>
+                    <div class="session-info" style="margin-top: 10px; font-size: 0.9rem; opacity: 0.8;">
+                        <span id="session-status">Sesión activa</span>
+                        <button onclick="handleLogout()" style="background: none; border: none; color: var(--primary); cursor: pointer; margin-left: 10px; text-decoration: underline;">
+                            Cerrar sesión
+                        </button>
+                    </div>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card glass-card">
+                        <div class="stat-icon income"><i class="fas fa-arrow-up"></i></div>
+                        <div class="stat-info">
+                            <h3>Total Facturado</h3>
+                            <p id="stat-total-billed">0,00 €</p>
+                        </div>
+                    </div>
+                    <div class="stat-card glass-card">
+                        <div class="stat-icon pending"><i class="fas fa-clock"></i></div>
+                        <div class="stat-info">
+                            <h3>Pendiente</h3>
+                            <p id="stat-pending">0,00 €</p>
+                        </div>
+                    </div>
+                    <div class="stat-card glass-card">
+                        <div class="stat-icon invoices"><i class="fas fa-file-lines"></i></div>
+                        <div class="stat-info">
+                            <h3>Facturas Emitidas</h3>
+                            <p id="stat-count">0</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="recent-section">
+                    <div class="section-header">
+                        <h2>Facturas Recientes</h2>
+                        <button class="btn btn-secondary btn-sm" id="btn-new-invoice-dash">Nueva Factura</button>
+                    </div>
+                    <div class="table-container glass-card">
+                        <table id="recent-invoices-table">
+                            <thead>
+                                <tr>
+                                    <th>Número</th>
+                                    <th>Cliente</th>
+                                    <th>Fecha</th>
+                                    <th>Total</th>
+                                    <th>Estado</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Dinámico -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Otras vistas se cargarán aquí -->
+            <div id="view-invoices" class="content-view hidden">
+                <div class="section-header">
+                    <h1>Gestión de Facturas</h1>
+                    <button class="btn btn-primary" id="btn-open-create-invoice">Nueva Factura</button>
+                </div>
+
+                <!-- Filtros Avanzados -->
+                <div class="filter-bar glass-card">
+                    <div class="filter-group">
+                        <label>Desde:</label>
+                        <input type="date" id="filter-start-date">
+                    </div>
+                    <div class="filter-group">
+                        <label>Hasta:</label>
+                        <input type="date" id="filter-end-date">
+                    </div>
+                    <div class="filter-group">
+                        <label>Cliente:</label>
+                        <select id="filter-client">
+                            <option value="">Todos los clientes</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Estado:</label>
+                        <select id="filter-status">
+                            <option value="">Todos</option>
+                            <option value="true">Pagadas</option>
+                            <option value="false">Pendientes</option>
+                        </select>
+                    </div>
+                    <button id="btn-apply-filters" class="btn btn-primary btn-sm"><i class="fas fa-filter"></i> Filtrar</button>
+                    <button id="btn-clear-filters" class="btn btn-secondary btn-sm" title="Limpiar Filtros"><i class="fas fa-undo"></i></button>
+                </div>
+                <div class="table-container glass-card">
+                    <table id="all-invoices-table">
+                        <thead>
+                            <tr>
+                                <th>Número</th>
+                                <th>Cliente</th>
+                                <th>Fecha</th>
+                                <th>Total</th>
+                                <th>Estado</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Dinámico -->
+                        </tbody>
+                    </table>
+            </div>
+            </div>
+
+            <!-- Vista de Clientes -->
+            <div id="view-clients" class="content-view hidden">
+                <div class="section-header">
+                    <h1>Clientes</h1>
+                    <button class="btn btn-primary btn-sm" id="btn-open-create-client"><i class="fas fa-plus"></i> Nuevo Cliente</button>
+                </div>
+                <div class="table-container glass-card">
+                    <table id="all-clients-table">
+                        <thead>
+                            <tr>
+                                <th>Nombre / Razón Social</th>
+                                <th>NIF/CIF</th>
+                                <th>Tipo</th>
+                                <th>Ciudad</th>
+                                <th>Email</th>
+                                <th>Teléfono</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Dinámico -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Vista de Perfil de Emisor -->
+            <div id="view-emisor" class="content-view hidden">
+                <div class="section-header">
+                    <h1><i class="fas fa-building"></i> Perfil de Emisor</h1>
+                    <div class="header-actions">
+                        <button class="btn btn-primary btn-sm" id="btn-create-emisor"><i class="fas fa-plus"></i> Nuevo Perfil</button>
+                        <button class="btn btn-secondary btn-sm" id="btn-refresh-emisores"><i class="fas fa-sync"></i> Actualizar</button>
+                    </div>
+                </div>
+
+                <!-- Lista de Perfiles de Emisor -->
+                <div class="emisor-list glass-card">
+                    <div id="emisor-list-container">
+                        <!-- Los perfiles se cargarán dinámicamente -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Vista de Informes -->
+            <div id="view-reports" class="content-view hidden">
+                <div class="section-header">
+                    <h1><i class="fas fa-chart-line"></i> Resumen de IVA (Modelo 303)</h1>
+                    <div class="header-actions" style="display: flex; gap: 10px;">
+                        <select id="report-year" style="width: 120px; margin-top: 0; padding: 5px 10px;"></select>
+                        <button class="btn btn-secondary btn-sm" id="btn-refresh-reports" title="Actualizar Datos"><i class="fas fa-sync"></i></button>
+                        <button class="btn btn-primary btn-sm" id="btn-export-csv-report"><i class="fas fa-file-csv"></i> Exportar CSV</button>
+                    </div>
+                </div>
+
+                <div class="reports-container">
+                    <div id="iva-cards-container" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 20px;">
+                        <!-- Las tarjetas de cada trimestre se cargarán aquí -->
+                    </div>
+                    
+                    <div class="annual-summary-section" style="margin-top: 40px;">
+                        <h2 style="margin-bottom: 20px;"><i class="fas fa-calendar-check"></i> Resumen Anual</h2>
+                        <div id="annual-summary-container" class="glass-card" style="padding: 30px;">
+                            <!-- Resumen anual dinámico -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Vista de Auditoría (Audit Log) -->
+            <div id="view-audit" class="content-view hidden">
+                <div class="section-header">
+                    <h1><i class="fas fa-history"></i> Registro de Auditoría</h1>
+                    <div class="header-actions">
+                        <button class="btn btn-secondary btn-sm" id="btn-verify-audit" title="Verificar Integridad de Cadena">
+                            <i class="fas fa-shield-alt"></i> Verificar Integridad
+                        </button>
+                        <button class="btn btn-secondary btn-sm" id="btn-refresh-audit">
+                            <i class="fas fa-sync"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="audit-status glass-card" id="audit-integrity-status" style="margin-bottom: 20px; display: none; padding: 15px;">
+                    <!-- Status message -->
+                </div>
+                <div class="table-container glass-card">
+                    <table id="audit-log-table">
+                        <thead>
+                            <tr>
+                                <th>Fecha/Hora</th>
+                                <th>Tipo</th>
+                                <th>Descripción</th>
+                                <th>Hash Actual</th>
+                                <th>Detalles</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Dinámico -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Vista de Configuración -->
+            <div id="view-settings" class="content-view hidden">
+                <div class="section-header">
+                    <h1>Configuración</h1>
+                </div>
+                <div class="glass-card settings-container">
+                    <div class="settings-group">
+                        <h3><i class="fas fa-folder-open"></i> Almacenamiento Local</h3>
+                        <p class="settings-desc">Elige dónde se guardan tus facturas y la base de datos de la aplicación.</p>
+                        
+                        <div class="path-display">
+                            <label>Ruta actual:</label>
+                            <code id="storage-path-display">Cargando...</code>
+                        </div>
+
+                        <div class="settings-actions">
+                            <button id="btn-change-path" class="btn btn-secondary">
+                                <i class="fas fa-edit"></i> Cambiar Carpeta
+                            </button>
+                            <button id="btn-open-path" class="btn btn-text">
+                                <i class="fas fa-external-link-alt"></i> Abrir en Carpeta
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="settings-group" style="margin-top: 30px; border-top: 1px solid rgba(0,0,0,0.1); padding-top: 20px;">
+                        <h3><i class="fas fa-list-ol"></i> Series de Numeración</h3>
+                        <p class="settings-desc">Gestiona tus series de facturación (Ej: F-2026, R-2026). Cada serie tiene su propio contador independiente.</p>
+                        
+                        <div class="table-mini-container">
+                            <table id="series-table-mini" class="mini-table">
+                                <thead>
+                                    <tr>
+                                        <th>Nombre</th>
+                                        <th>Prefijo</th>
+                                        <th>Siguiente</th>
+                                        <th>Tipo</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Dinámico -->
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="settings-actions" style="margin-top: 10px;">
+                            <button id="btn-add-serie" class="btn btn-secondary btn-sm">
+                                <i class="fas fa-plus"></i> Nueva Serie
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="settings-group" style="margin-top: 30px; border-top: 1px solid rgba(0,0,0,0.1); padding-top: 20px;">
+                        <h3><i class="fas fa-history"></i> Copias de Seguridad</h3>
+                        <p class="settings-desc">Exporta todos tus datos a un archivo externo o restaura una copia previa.</p>
+                        
+                        <div class="settings-actions" style="display: flex; gap: 15px;">
+                            <button id="btn-export-db" class="btn btn-primary">
+                                <i class="fas fa-file-export"></i> Exportar Backup (.db)
+                            </button>
+                            <button id="btn-import-db" class="btn btn-secondary">
+                                <i class="fas fa-file-import"></i> Importar Backup
+                            </button>
+                        </div>
+                        <small class="field-hint" style="margin-top: 10px; display: block;">
+                            <i class="fas fa-exclamation-triangle"></i> <strong>Atención:</strong> Importar un backup sobrescribirá todos tus datos actuales.
+                        </small>
+                    </div>
+
+                    <div class="settings-group" style="margin-top: 30px; border-top: 1px solid rgba(0,0,0,0.1); padding-top: 20px;">
+                        <h3><i class="fas fa-tools"></i> Soporte y Diagnóstico</h3>
+                        <p class="settings-desc">¿Tienes problemas con la aplicación? Exporta un reporte técnico para que el equipo de desarrollo pueda ayudarte.</p>
+                        
+                        <div class="settings-actions">
+                            <button id="btn-export-logs" class="btn btn-secondary">
+                                <i class="fas fa-bug"></i> Exportar Reporte de Errores
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </section>
+
+
+    <!-- Modal para Cliente -->
+    <div id="client-modal" class="modal-container hidden">
+        <div class="modal-content glass-card">
+            <div class="modal-header">
+                <h2 id="client-modal-title">Nuevo Cliente</h2>
+                <button class="close-modal"><i class="fas fa-times"></i></button>
+            </div>
+            <form id="client-form">
+                <input type="hidden" id="client-id">
+
+                <!-- Tipo de cliente -->
+                <div class="form-group">
+                    <label>Tipo de Cliente</label>
+                    <div class="tipo-selector">
+                        <label class="tipo-option">
+                            <input type="radio" name="tipoCliente" value="EMPRESA" checked>
+                            <span><i class="fas fa-building"></i> Empresa / Autónomo</span>
+                        </label>
+                        <label class="tipo-option">
+                            <input type="radio" name="tipoCliente" value="PARTICULAR">
+                            <span><i class="fas fa-user"></i> Particular</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group col">
+                        <label for="client-nombre">Nombre / Razón Social <span class="required">*</span></label>
+                        <input type="text" id="client-nombre" placeholder="Nombre completo o razón social" required>
+                    </div>
+                    <div class="form-group col" id="razon-social-group">
+                        <label for="client-razon-social">Nombre Comercial / Alias</label>
+                        <input type="text" id="client-razon-social" placeholder="Nombre comercial (opcional)">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group col">
+                        <label for="client-nif">NIF / CIF</label>
+                        <input type="text" id="client-nif" placeholder="B12345678 / 12345678A">
+                        <small class="field-hint" id="nif-hint">Para empresas es obligatorio. Para particulares, opcional.</small>
+                    </div>
+                    <div class="form-group col">
+                        <label for="client-email">Email</label>
+                        <input type="email" id="client-email" placeholder="facturacion@empresa.com">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group col">
+                        <label for="client-telefono">Teléfono</label>
+                        <input type="text" id="client-telefono" placeholder="+34 600 000 000">
+                    </div>
+                </div>
+
+                <hr class="form-separator-light">
+                <p class="form-section-title"><i class="fas fa-map-marker-alt"></i> Domicilio Fiscal</p>
+
+                <div class="form-group">
+                    <label for="client-direccion">Dirección <span class="required">*</span></label>
+                    <input type="text" id="client-direccion" placeholder="Calle, número, piso..." required>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group col-4">
+                        <label for="client-cp">Código Postal</label>
+                        <input type="text" id="client-cp" placeholder="28001" maxlength="10">
+                    </div>
+                    <div class="form-group col-4">
+                        <label for="client-ciudad">Ciudad</label>
+                        <input type="text" id="client-ciudad" placeholder="Madrid">
+                    </div>
+                    <div class="form-group col-4">
+                        <label for="client-provincia">Provincia</label>
+                        <input type="text" id="client-provincia" placeholder="Madrid">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group col">
+                        <label for="client-pais">País</label>
+                        <input type="text" id="client-pais" placeholder="España" value="España">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="client-dir-entrega">Dirección de Entrega <small>(si es distinta)</small></label>
+                    <input type="text" id="client-dir-entrega" placeholder="Dirección alternativa de entrega (opcional)">
+                </div>
+
+                <div class="form-group">
+                    <label for="client-observaciones">Observaciones Internas</label>
+                    <textarea id="client-observaciones" rows="2" placeholder="Notas internas sobre el cliente (no aparecen en factura)"></textarea>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary close-modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary" id="client-submit-btn">Crear Cliente</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal para Nueva Factura -->
+    <div id="invoice-modal" class="modal-container hidden">
+        <div class="modal-content glass-card">
+            <div class="modal-header">
+                <h2 id="invoice-modal-title">Crear Nueva Factura</h2>
+                <button class="close-modal"><i class="fas fa-times"></i></button>
+            </div>
+            <div id="rectification-banner" class="warning-banner hidden" style="margin: 10px 0; padding: 10px; background: rgba(255, 193, 7, 0.1); border-left: 4px solid #ffc107; border-radius: 4px;">
+                <i class="fas fa-exclamation-circle" style="color: #ffc107;"></i>
+                <span><strong>Modo Rectificativa:</strong> Se está corrigiendo la factura <span id="rectified-invoice-num"></span>. La nueva numeración pertenecerá a la serie rectificativa.</span>
+            </div>
+            <form id="create-invoice-form">
+                <input type="hidden" id="rectified-invoice-id">
+                <div class="form-row">
+                    <div class="form-group col-4">
+                        <label for="invoice-serie">Serie de Facturación</label>
+                        <select id="invoice-serie" required>
+                            <!-- Dinámico -->
+                        </select>
+                    </div>
+                    <div class="form-group col">
+                        <label for="invoice-client">Cliente</label>
+                        <select id="invoice-client" required>
+                            <!-- Dinámico -->
+                        </select>
+                    </div>
+                    <div class="form-group col-4" id="tipo-factura-group">
+                        <label for="invoice-type">Tipo de Factura</label>
+                        <select id="invoice-type">
+                            <option value="F1" selected>F1 - Factura Ordinaria</option>
+                            <option value="R1">R1 - Rectificativa (Error de cuota)</option>
+                            <option value="R2">R2 - Rectificativa (Art. 80. Uno, Dos y Seis LIVA)</option>
+                            <option value="R3">R3 - Rectificativa (Art. 80. Tres LIVA)</option>
+                            <option value="R4">R4 - Rectificativa (Art. 80. Cuatro LIVA)</option>
+                            <option value="R5">R5 - Rectificativa (Otras causas)</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div id="invoice-lines-container">
+                    <div class="line-header">
+                        <span>Descripción</span>
+                        <span>Cant.</span>
+                        <span>Precio</span>
+                        <span>IVA</span>
+                        <span></span>
+                    </div>
+                    <div class="lines-list" id="lines-list">
+                        <!-- Línea por defecto -->
+                        <div class="invoice-line">
+                            <input type="text" placeholder="Concepto" class="line-desc" list="services-list" required>
+                            <input type="number" value="1" min="1" class="line-qty" required>
+                            <input type="number" step="0.01" placeholder="0.00" min="0" class="line-price" required>
+                            <select class="line-iva">
+                                <option value="21">21%</option>
+                                <option value="10">10%</option>
+                                <option value="4">4%</option>
+                                <option value="0">0%</option>
+                            </select>
+                            <button type="button" class="remove-line"><i class="fas fa-trash"></i></button>
+                        </div>
+                    </div>
+                    <button type="button" id="add-line-btn" class="btn btn-text"><i class="fas fa-plus"></i> Añadir Línea</button>
+                </div>
+
+                <div class="form-separator"></div>
+
+                <div class="form-row">
+                    <div class="form-group col">
+                        <label for="invoice-discount">Descuento (%)</label>
+                        <input type="number" id="invoice-discount" value="0" min="0" max="100" step="0.01" required>
+                    </div>
+                    <div class="form-group col">
+                        <label for="invoice-payment-method">Método de Pago</label>
+                        <select id="invoice-payment-method">
+                            <option value="Transferencia">Transferencia</option>
+                            <option value="Efectivo">Efectivo</option>
+                            <option value="Tarjeta">Tarjeta</option>
+                        </select>
+                    </div>
+                    <div class="form-group col-4" style="display:flex; align-items:center; padding-top:10px; gap:10px;">
+                        <label style="display:flex; align-items:center; gap:5px; cursor:pointer;">
+                            <input type="checkbox" id="invoice-paid-check"> ¿Cobrada?
+                        </label>
+                        <input type="number" id="invoice-amount-paid" placeholder="0.00" step="0.01" style="width: 80px; margin-top:0; padding:4px; font-size:0.8rem;">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="invoice-notes">Notas / Observaciones</label>
+                    <textarea id="invoice-notes" rows="2" placeholder="Información adicional..."></textarea>
+                </div>
+
+                <div class="modal-footer" style="display:flex; justify-content: space-between; border-top: 1px solid var(--glass-border); padding-top: 15px;">
+                    <div>
+                        <button type="button" id="btn-preview-invoice" class="btn btn-secondary"><i class="fas fa-eye"></i> Previsualizar PDF</button>
+                    </div>
+                    <div style="display:flex; gap:10px;">
+                        <button type="button" class="btn btn-secondary close-modal">Cancelar</button>
+                        <button type="submit" form="create-invoice-form" class="btn btn-primary" id="invoice-submit-btn">Emitir Factura</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Modal de Previsualización PDF -->
+    <div id="preview-modal" class="modal-container hidden">
+        <div class="modal-content glass-card" style="width: 85%; height: 90%; max-width: 1000px; display: flex; flex-direction: column;">
+            <div class="modal-header">
+                <h2>Vista Previa del Documento</h2>
+                <button class="btn btn-secondary close-modal" data-modal="preview-modal"><i class="fas fa-times"></i></button>
+            </div>
+            <div id="pdf-preview-container" style="flex: 1; min-height: 0; background: #525659; border-radius: 4px;">
+                <iframe id="pdf-preview-frame" style="width: 100%; height: 100%; border: none;"></iframe>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para Firma Digital XAdES -->
+    <div id="xades-modal" class="modal-container hidden">
+        <div class="modal-content glass-card">
+            <div class="modal-header">
+                <h2><i class="fas fa-certificate"></i> Firma Digital Veri*factu</h2>
+                <button class="close-modal"><i class="fas fa-times"></i></button>
+            </div>
+            
+            <div class="xades-info">
+                <div class="info-card">
+                    <h3><i class="fas fa-file-invoice"></i> Factura a Firmar</h3>
+                    <div id="xades-factura-info">
+                        <p><strong>Número:</strong> <span id="xades-factura-numero">-</span></p>
+                        <p><strong>Cliente:</strong> <span id="xades-factura-cliente">-</span></p>
+                        <p><strong>Importe:</strong> <span id="xades-factura-total">-</span></p>
+                    </div>
+                </div>
+                
+                <div class="info-card">
+                    <h3><i class="fas fa-shield-alt"></i> Certificado Digital</h3>
+                    <form id="xades-form">
+                        <div class="form-group">
+                            <label for="cert-file">Archivo de Certificado (.p12/.pfx)</label>
+                            <div class="file-input-wrapper">
+                                <input type="text" id="cert-file-display" readonly placeholder="Selecciona tu certificado digital..." class="file-display">
+                                <button type="button" id="btn-select-cert" class="btn btn-secondary">
+                                    <i class="fas fa-folder-open"></i> Examinar
+                                </button>
+                            </div>
+                            <input type="hidden" id="cert-file" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="cert-password">Contraseña del Certificado</label>
+                            <div class="input-wrapper">
+                                <i class="fas fa-lock"></i>
+                                <input type="password" id="cert-password" placeholder="Introduce la contraseña..." required>
+                                <button type="button" id="toggle-password" class="btn-icon" title="Mostrar/ocultar contraseña">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                            <small class="field-hint">La contraseña es necesaria para acceder a la clave privada del certificado</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="output-dir">Directorio de Salida</label>
+                            <div class="file-input-wrapper">
+                                <input type="text" id="output-dir-display" readonly placeholder="Selecciona dónde guardar el XML firmado..." class="file-display">
+                                <button type="button" id="btn-select-output" class="btn btn-secondary">
+                                    <i class="fas fa-folder-open"></i> Examinar
+                                </button>
+                            </div>
+                            <input type="hidden" id="output-dir">
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="xades-status" id="xades-status">
+                <div class="status-item">
+                    <i class="fas fa-info-circle"></i>
+                    <span>La firma se realizará localmente con el estándar XAdES-EPES conforme a los requisitos de la AEAT</span>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary close-modal">Cancelar</button>
+                <button type="button" id="btn-sign-xades" class="btn btn-primary">
+                    <i class="fas fa-signature"></i> Firmar Factura
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- PDF Options Dropdown Menu -->
+    <div id="pdf-dropdown" class="dropdown-menu hidden">
+        <div class="dropdown-header">
+            <h3><i class="fas fa-file-pdf"></i> Opciones PDF</h3>
+            <div class="dropdown-factura-info">
+                <p><strong>Número:</strong> <span id="dropdown-factura-numero">-</span></p>
+                <p><strong>Cliente:</strong> <span id="dropdown-factura-cliente">-</span></p>
+            </div>
+        </div>
+        
+        <div class="dropdown-section">
+            <h4><i class="fas fa-eye"></i> Visualización</h4>
+            <button id="btn-preview-pdf" class="dropdown-item">
+                <i class="fas fa-search"></i> Previsualizar
+            </button>
+        </div>
+
+        <div class="dropdown-section">
+            <h4><i class="fas fa-save"></i> Guardar</h4>
+            <button id="btn-save-pdf" class="dropdown-item">
+                <i class="fas fa-download"></i> Guardar como...
+            </button>
+            <button id="btn-save-pdf-watermark" class="dropdown-item">
+                <i class="fas fa-copy"></i> Guardar copia (con marca)
+            </button>
+        </div>
+
+        <div class="dropdown-section">
+            <h4><i class="fas fa-print"></i> Impresión</h4>
+            <button id="btn-print-pdf" class="dropdown-item">
+                <i class="fas fa-print"></i> Imprimir...
+            </button>
+        </div>
+
+        <div class="dropdown-section">
+            <h4><i class="fas fa-cog"></i> Opciones Avanzadas</h4>
+            <div class="dropdown-options">
+                <div class="form-group">
+                    <label for="pdf-quality">Calidad:</label>
+                    <select id="pdf-quality">
+                        <option value="standard">Estándar</option>
+                        <option value="high">Alta</option>
+                        <option value="print">Impresión</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="pdf-logo">Logo:</label>
+                    <select id="pdf-logo">
+                        <option value="">Sin logo</option>
+                    </select>
+                </div>
+                <div class="form-group checkbox-group">
+                    <label>
+                        <input type="checkbox" id="pdf-signature" checked>
+                        Incluir firma digital
+                    </label>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para Perfil de Emisor -->
+    <div id="emisor-modal" class="modal-container hidden">
+        <div class="modal-content glass-card">
+            <div class="modal-header">
+                <h2><i class="fas fa-building"></i> <span id="emisor-modal-title">Nuevo Perfil de Emisor</span></h2>
+                <button class="close-modal"><i class="fas fa-times"></i></button>
+            </div>
+            
+            <form id="emisor-form">
+                <div class="form-sections">
+                    <!-- Datos Básicos -->
+                    <div class="form-section">
+                        <h3><i class="fas fa-info-circle"></i> Datos Básicos</h3>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="emisor-nombre">Nombre de la Empresa *</label>
+                                <input type="text" id="emisor-nombre" name="nombre" required placeholder="Hermanos Gómez Win S.L.">
+                            </div>
+                            <div class="form-group">
+                                <label for="emisor-nif">NIF/CIF Responsable (Empresa) *</label>
+                                <input type="text" id="emisor-nif" name="nif" required placeholder="B75700476" minlength="9" maxlength="9">
+                                <small class="field-hint">Es el NIF de la empresa que utiliza el software y emite las facturas.</small>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="emisor-regimen-fiscal">Régimen Fiscal *</label>
+                            <select id="emisor-regimen-fiscal" name="regimenFiscal" required>
+                                <option value="">Selecciona un régimen</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Dirección Fiscal -->
+                    <div class="form-section">
+                        <h3><i class="fas fa-map-marker-alt"></i> Dirección Fiscal</h3>
+                        <div class="form-group">
+                            <label for="emisor-direccion">Dirección *</label>
+                            <input type="text" id="emisor-direccion" name="direccion" required placeholder="C/ Islas Galápagos, 36 Bajo">
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="emisor-cp">Código Postal *</label>
+                                <input type="text" id="emisor-cp" name="cp" required placeholder="28300" maxlength="5">
+                            </div>
+                            <div class="form-group">
+                                <label for="emisor-ciudad">Ciudad *</label>
+                                <input type="text" id="emisor-ciudad" name="ciudad" required placeholder="Aranjuez">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="emisor-provincia">Provincia *</label>
+                                <input type="text" id="emisor-provincia" name="provincia" required placeholder="Madrid">
+                            </div>
+                            <div class="form-group">
+                                <label for="emisor-pais">País *</label>
+                                <input type="text" id="emisor-pais" name="pais" required value="ES" placeholder="ES">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Contacto -->
+                    <div class="form-section">
+                        <h3><i class="fas fa-phone"></i> Contacto</h3>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="emisor-telefono">Teléfono</label>
+                                <input type="tel" id="emisor-telefono" name="telefono" placeholder="918930000">
+                            </div>
+                            <div class="form-group">
+                                <label for="emisor-email">Email</label>
+                                <input type="email" id="emisor-email" name="email" placeholder="winowinconsulting@gmail.com">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="emisor-web">Sitio Web</label>
+                            <input type="url" id="emisor-web" name="web" placeholder="https://www.winowin.consulting">
+                        </div>
+                    </div>
+                        
+                        <!-- Configuración de Email -->
+                        <div class="form-section">
+                            <h3><i class="fas fa-envelope"></i> Configuración de Email</h3>
+                            <div class="form-group">
+                                <label style="display: flex; align-items: center; gap: 10px;">
+                                    <input type="checkbox" id="emisor-email-envio" name="emailEnvioPorDefecto">
+                                    Activar envío automático de facturas por email
+                                </label>
+                                <small class="field-hint">Si se activa, las facturas se enviarán automáticamente a los clientes que tengan email configurado</small>
+                            </div>
+                            <div class="form-group">
+                                <label for="emisor-email-plantilla">Plantilla de Email Personalizada (Opcional)</label>
+                                <textarea id="emisor-email-plantilla" name="emailPlantilla" rows="4" placeholder="Usa variables: {nombre_cliente}, {numero_factura}, {fecha_emision}, {nombre_empresa}"></textarea>
+                                <small class="field-hint">Deja vacío para usar la plantilla predeterminada</small>
+                            </div>
+
+                            <!-- Configuración SMTP -->
+                            <div class="smtp-section">
+                                <h4 style="margin: 18px 0 12px; font-size: 0.95rem; color: var(--text-muted); display:flex; align-items:center; gap:8px;">
+                                    <i class="fas fa-server"></i> Servidor de Salida (SMTP)
+                                    <small style="font-weight:400; font-size:0.8rem;">(deja vacío para usar modo prueba Ethereal)</small>
+                                </h4>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="smtp-from-name">Nombre del Remitente</label>
+                                        <input type="text" id="smtp-from-name" placeholder="Win o Win Facturación" autocomplete="off">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="smtp-user">Email Remitente *</label>
+                                        <input type="email" id="smtp-user" placeholder="winowinconsulting@gmail.com" autocomplete="username">
+                                    </div>
+                                </div>
+                                <div class="form-row" style="display: none;">
+                                    <div class="form-group">
+                                        <label for="smtp-host">Host SMTP</label>
+                                        <input type="text" id="smtp-host" placeholder="smtp.gmail.com" autocomplete="off">
+                                    </div>
+                                    <div class="form-group" style="max-width: 120px;">
+                                        <label for="smtp-port">Puerto</label>
+                                        <input type="number" id="smtp-port" placeholder="587" min="1" max="65535">
+                                    </div>
+                                    <div class="form-group" style="max-width: 140px; justify-content: flex-end; padding-top: 24px;">
+                                        <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
+                                            <input type="checkbox" id="smtp-secure"> SSL/TLS
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="smtp-pass">Contraseña (App Password)</label>
+                                    <div class="input-wrapper">
+                                        <i class="fas fa-lock"></i>
+                                        <input type="password" id="smtp-pass" placeholder="••••••••••••••••" autocomplete="new-password">
+                                        <button type="button" class="btn-icon" id="smtp-toggle-pass" title="Mostrar/ocultar">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                    </div>
+                                    <small class="field-hint">Para Gmail, usa una <strong>Contraseña de Aplicación</strong>, no tu contraseña habitual.</small>
+                                </div>
+                                <div style="display:flex; align-items:center; gap:12px; margin-top:8px;">
+                                    <button type="button" id="btn-test-smtp" class="btn btn-secondary btn-sm">
+                                        <i class="fas fa-plug"></i> Probar Conexión
+                                    </button>
+                                    <button type="button" id="btn-save-smtp" class="btn btn-primary btn-sm">
+                                        <i class="fas fa-save"></i> Guardar Configuración SMTP
+                                    </button>
+                                    <span id="smtp-test-result" style="font-size:0.9rem;"></span>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <!-- Configuración de Facturación -->
+                        <div class="form-section">
+                        <h3><i class="fas fa-file-invoice"></i> Configuración de Facturación</h3>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="emisor-serie">Serie por Defecto</label>
+                                <input type="text" id="emisor-serie" name="seriePorDefecto" placeholder="A" maxlength="1">
+                            </div>
+                            <div class="form-group">
+                                <label for="emisor-iva">IVA por Defecto (%)</label>
+                                <input type="number" id="emisor-iva" name="ivaPorDefecto" placeholder="21" min="0" max="100" step="0.01">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="emisor-prefijo">Prefijo Factura</label>
+                                <input type="text" id="emisor-prefijo" name="prefijoFactura" placeholder="F" maxlength="3">
+                            </div>
+                            <div class="form-group">
+                                <label for="emisor-proximo-numero">Próximo Número</label>
+                                <input type="number" id="emisor-proximo-numero" name="proximoNumeroFactura" placeholder="1" min="1">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="emisor-metodo-pago">Método de Pago por Defecto</label>
+                            <select id="emisor-metodo-pago" name="metodoPagoPorDefecto">
+                                <option value="01">Efectivo</option>
+                                <option value="02">Transferencia</option>
+                                <option value="03">Tarjeta</option>
+                                <option value="04">Domiciliación</option>
+                                <option value="05">Otros</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Datos Veri*factu -->
+                    <div class="form-section">
+                        <h3><i class="fas fa-shield-alt"></i> Datos Veri*factu</h3>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="emisor-sif-nombre">Nombre del Software</label>
+                                <input type="text" id="emisor-sif-nombre" name="sifNombre" placeholder="Win o Win Facturación">
+                            </div>
+                            <div class="form-group">
+                                <label for="emisor-sif-version">Versión</label>
+                                <input type="text" id="emisor-sif-version" name="sifVersion" placeholder="1.0.0">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="emisor-sif-nif">NIF del responsable del sistema informático *</label>
+                            <input type="text" id="emisor-sif-nif" name="sifNif" placeholder="B12345678" maxlength="12" required>
+                            <small class="field-hint">Es el NIF del productor del sistema (RD 1007/2023). En software in-house, es la empresa (persona jurídica), no el desarrollador individual.</small>
+                        </div>
+                    </div>
+
+                    <!-- Información del Productor (RD 1007/2023) -->
+                    <div class="form-section">
+                        <h3><i class="fas fa-user-tie"></i> Información del Productor</h3>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="emisor-productor-nombre">Nombre/Razón Social</label>
+                                <input type="text" id="emisor-productor-nombre" name="productorNombre" placeholder="Nombre completo del desarrollador/empresa">
+                            </div>
+                            <div class="form-group">
+                                <label for="emisor-productor-email">Email de Contacto</label>
+                                <input type="email" id="emisor-productor-email" name="productorEmail" placeholder="contacto@desarrollador.com">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="emisor-productor-direccion">Dirección</label>
+                            <input type="text" id="emisor-productor-direccion" name="productorDireccion" placeholder="C/ Calle Principal, 123">
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="emisor-productor-cp">Código Postal</label>
+                                <input type="text" id="emisor-productor-cp" name="productorCp" placeholder="28013" maxlength="5">
+                            </div>
+                            <div class="form-group">
+                                <label for="emisor-productor-localidad">Localidad</label>
+                                <input type="text" id="emisor-productor-localidad" name="productorLocalidad" placeholder="Madrid">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="emisor-productor-provincia">Provincia</label>
+                                <input type="text" id="emisor-productor-provincia" name="productorProvincia" placeholder="Madrid">
+                            </div>
+                            <div class="form-group">
+                                <label for="emisor-productor-pais">País</label>
+                                <input type="text" id="emisor-productor-pais" name="productorPais" placeholder="España">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="emisor-productor-telefono">Teléfono</label>
+                            <input type="tel" id="emisor-productor-telefono" name="productorTelefono" placeholder="+34 600 000 000">
+                        </div>
+                        <div class="info-box">
+                            <i class="fas fa-info-circle"></i>
+                            <strong>Nota Legal (Veri*Factu):</strong> Según el RD 1007/2023, el responsable del sistema informático debe estar plenamente identificado. Si el desarrollo es propio (in-house), el responsable y productor legal es su propia empresa.
+                        </div>
+                    </div>
+
+                    <!-- Configuración Adicional -->
+                    <div class="form-section">
+                        <h3><i class="fas fa-cog"></i> Configuración Adicional</h3>
+                        <div class="form-group">
+                            <label for="emisor-observaciones">Observaciones por Defecto</label>
+                            <textarea id="emisor-observaciones" name="observacionesPorDefecto" rows="3" placeholder="Observaciones que aparecerán en cada factura..."></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="emisor-pie-pagina">Pie de Página</label>
+                            <input type="text" id="emisor-pie-pagina" name="pieDePagina" placeholder="Gracias por su confianza">
+                        </div>
+                        <div class="form-group checkbox-group">
+                            <label>
+                                <input type="checkbox" id="emisor-activo" name="activo" checked>
+                                Marcar como perfil activo
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary close-modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Guardar Perfil
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal para Nueva Serie -->
+    <div id="serie-modal" class="modal-container hidden">
+        <div class="modal-content glass-card" style="max-width: 500px;">
+            <div class="modal-header">
+                <h2>Nueva Serie de Facturación</h2>
+                <button class="btn btn-secondary close-modal" data-modal="serie-modal"><i class="fas fa-times"></i></button>
+            </div>
+            <form id="serie-form" style="padding: 20px;">
+                <div class="form-group">
+                    <label for="serie-name">Nombre de la Serie (Ej: Formación 2026)</label>
+                    <input type="text" id="serie-name" required placeholder="Nombre descriptivo">
+                </div>
+                <div class="form-row">
+                    <div class="form-group col">
+                        <label for="serie-prefix">Prefijo (Ej: FOR-)</label>
+                        <input type="text" id="serie-prefix" required placeholder="Letras iniciales" maxlength="10">
+                    </div>
+                    <div class="form-group col">
+                        <label for="serie-next">Siguiente Número</label>
+                        <input type="number" id="serie-next" value="1" min="1" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="serie-type">Tipo de Serie</label>
+                    <select id="serie-type">
+                        <option value="ORDINARIA">ORDINARIA (Facturas normales)</option>
+                        <option value="RECTIFICATIVA">RECTIFICATIVA (Abonos y correcciones)</option>
+                    </select>
+                </div>
+                <div class="modal-footer" style="padding: 15px 0 0 0; border-top: 1px solid var(--glass-border);">
+                    <button type="button" class="btn btn-secondary close-modal" data-modal="serie-modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Crear Serie</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <!-- Datalist para servicios comerciales -->
+    <datalist id="services-list">
+        <option value="Formación bonificada">
+        <option value="Formación no bonificada">
+        <option value="Implantaciones obligatorias">
+        <option value="Agentes IA">
+        <option value="Automatizaciones">
+        <option value="API personalizadas">
+        <option value="Gestión de ayudas y subvenciones">
+        <option value="WEBS">
+        <option value="Ajuste / Descuento">
+        <option value="Otros servicios a demanda">
+    </datalist>
+
+    <script src="js/app.js"></script>
+</body>
+</html>

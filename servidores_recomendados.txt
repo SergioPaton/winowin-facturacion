@@ -1,0 +1,30 @@
+# Comparativa de Servidores VPS (Europa)
+
+Para el despliegue de tu API de facturación, he analizado varios proveedores europeos que cumplen con los requisitos mínimos (Node.js, MySQL, 2GB+ RAM).
+
+## Resumen de Opciones
+
+| Proveedor | Plan Sugerido | RAM | CPU | Precio (aprox.) | Ubicación | Ventajas |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| **Netcup** | VPS Nano G11s | 2 GB | 2 vCore | **~2,03 €/mes** | Alemania | El precio más bajo del mercado. |
+| **OVHcloud** | Starter | 2 GB | 1 vCore | **3,50 €/mes** | Multinacional (EU) | Muy fiable, gran red, excelente anti-DDoS. |
+| **Hetzner** | Cloud CX22 | 4 GB | 2 vCPU | **3,79 €/mes** | Alemania/Finlandia | Excelente rendimiento y panel de control moderno. |
+| **Contabo** | Cloud VPS S | 8 GB | 4 vCPU | **4,50 €/mes** | Alemania | Máximos recursos por el precio. Ideal si escala rápido. |
+| **Arsys** | VPS Pro | 4 GB | 2 vCPU | **10,00 €/mes** | España | Soporte en español y servidores en España (baja latencia local). |
+| **Scaleway** | Stardust / DEV1-S| 2 GB | 2 vCPU | **~6,42 €/mes** | Francia/Holanda | Buen ecosistema cloud, pero más caro por recursos. |
+
+## Recomendaciones para tu MVP
+
+1.  **Opción Calidad-Precio (Recomendada): Hetzner (CX22)**
+    Por solo **3,79 €/mes**, tienes 4 GB de RAM (el doble de lo requerido), lo que garantiza que la generación de PDFs y las firmas XML funcionen sin problemas de memoria incluso bajo carga.
+    
+2.  **Opción Económica: Netcup**
+    Si buscas el coste mínimo absoluto, Netcup es imbatible con su plan de **~2 €/mes**, aunque el soporte puede ser más limitado que en OVH o Hetzner.
+
+3.  **Opción por Cercanía/Soporte: Arsys**
+    Si prefieres que la factura y el soporte técnico sean 100% en español y los datos residan físicamente en España por política de empresa, Arsys es la mejor opción nacional, aunque el coste sube ligeramente.
+
+## Consideraciones Adicionales
+- **Backups**: La mayoría de estos precios no incluyen copias de seguridad automáticas (suele ser un +20% extra).
+- **IP Fija**: Todos incluyen una IPv4/IPv6 pública, necesaria para que la AEAT identifique el servidor emisor.
+- **Escalabilidad**: Todos permiten subir de plan en el futuro si la aplicación crece.

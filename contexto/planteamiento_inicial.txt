@@ -1,0 +1,81 @@
+Requisitos para un software de facturación electrónica que cumpla con las exigencias legales de España.
+
+
+1. Gestión de Registros de Facturación (Alta y Anulación)
+El software debe ser capaz de generar automáticamente un registro informático por cada factura emitida (alta) o anulada. Estos registros deben garantizar:
+Integridad e inalterabilidad: Una vez generado el registro, no puede ser modificado sin que quede constancia.
+Trazabilidad: Cada registro debe estar encadenado con el anterior, creando una secuencia lógica y verificable.
+2. Firma Electrónica y Huella (Hash)
+Esta es una de las funcionalidades críticas detalladas en el enlace:
+Generación de Huella o "Hash": Todos los registros deben incluir una huella digital que encadene unos con otros.
+Firma Electrónica (XAdES): * Si el sistema es "No Verificable" (no envía los datos a la AEAT en tiempo real), el software debe firmar obligatoriamente todos los registros de alta, anulación y de eventos usando el estándar XAdES Enveloped Signature.
+Si el sistema es Verifactu, la firma es opcional, ya que la autenticación se realiza mediante el certificado electrónico en el momento del envío.
+Herramienta de verificación: El software debe permitir al usuario comprobar de forma "rápida, fácil e intuitiva" la validez de las firmas generadas.
+3. Capacidad de Remisión (Sistema Verifactu)
+El software debe incluir la funcionalidad técnica para conectarse con la sede electrónica de la Agencia Tributaria y:
+Enviar los registros de facturación de forma automática e inmediata.
+Gestionar el intercambio de mensajes de respuesta de la AEAT.
+4. Registro de Eventos (Logs)
+El sistema debe llevar un control de operaciones (especialmente en sistemas no Verifactu) que registre:
+Encendidos y apagados del software.
+Errores ocurridos durante el proceso de facturación.
+Actualizaciones del sistema.
+Cualquier interacción que pueda afectar a la integridad de los datos de facturación.
+5. Elementos Visuales en la Factura
+El software debe ser capaz de imprimir o generar PDFs de facturas que incluyan:
+Código QR: Que contenga los datos identificativos de la factura para que el receptor pueda verificarla.
+Distintivo "VERI*FACTU": Solo si el software está configurado para la remisión inmediata de datos a la AEAT.
+6. Conservación y Accesibilidad
+Debe asegurar el almacenamiento seguro de todos los registros generados durante el periodo de prescripción legal.
+Debe permitir el acceso inmediato a estos registros en caso de una inspección tributaria, garantizando que sean legibles.
+
+
+
+API vs Agente ia
+Opción A: API REST tradicional
+Pros
+Determinismo y trazabilidad. Verifactu exige que cada registro de facturación sea inmutable, con huella (hash) encadenada y firma electrónica. Una API ejecuta operaciones predecibles y auditables, esencial para cumplir esto.
+LOPD más fácil de gestionar. El control de acceso a datos personales (nombre, NIF, cuenta bancaria del cliente) es granular y predecible. Puedes definir exactamente qué endpoint accede a qué dato.
+Integración directa con la AEAT. La remisión de registros a Hacienda sigue un protocolo técnico estricto (XML firmado, certificado digital). Una API encapsula este proceso de forma limpia.
+Menor riesgo regulatorio. El software de facturación (SIF) debe certificarse mediante declaración responsable. Un comportamiento no determinista de una IA sería difícil de certificar.
+Madurez tecnológica. Bancos, ERPs y otros sistemas ya saben cómo consumir APIs. La adopción es inmediata.
+Contras
+Requiere que el usuario entienda qué hacer (emitir factura, anular, consultar...).
+La experiencia de usuario puede ser más rígida si se expone directamente.
+Más código de negocio que mantener manualmente.
+
+Opción B: Agente IA
+Pros
+Experiencia de usuario superior. El usuario puede decir "factura a Juan López 3 horas de consultoría a 80€" y el agente lo gestiona.
+Automatización de tareas complejas. Puede detectar errores, sugerir tipos de IVA correctos, recordar vencimientos, o identificar patrones.
+Soporte natural para pymes sin contable. Reduce la curva de aprendizaje.
+Contras
+Incompatibilidad con la inmutabilidad de Verifactu. El reglamento exige que los registros de facturación no puedan modificarse, con cadena de hash verificable. Un agente que "interpreta" o "corrige" de forma autónoma puede romper este requisito.
+Riesgo con datos personales (LOPD/RGPD). Un agente que procesa lenguaje natural sobre facturas maneja datos personales de forma menos controlada. Habría que auditar cada inferencia, lo cual es complejo.
+Difícil de certificar ante Hacienda. La declaración responsable del SIF implica que el sistema se comporta de manera predecible y conforme. Un agente no determinista complica esta garantía.
+Alucinaciones = errores fiscales. Una cifra incorrecta en una factura emitida a la AEAT puede tener consecuencias legales.
+La arquitectura ideal es una API como núcleo + agente como interfaz opcional.
+Usuario
+   ↓
+[Agente IA]  ← interfaz conversacional (opcional)
+   ↓
+[API REST]   ← lógica de negocio certificable
+   ↓
+[Motor Verifactu: hash, firma, remisión AEAT]
+   ↓
+[BBDD con trazabilidad completa + cifrado LOPD]
+Así el agente actúa como asistente de entrada, pero nunca toca directamente los registros fiscales — eso lo hace la API, de forma determinista, auditable y certificable. Cumples Verifactu, cumples LOPD, y ofreces buena experiencia de usuario.
+
+Recursos: 
+
+
+
+
+API Gateway — Express.js El núcleo de todo. Gestiona autenticación (JWT o OAuth2), validación de peticiones, rate limiting y HTTPS. Es la única puerta de entrada al sistema. Librerías clave: express, helmet, express-rate-limit, jsonwebtoken.
+Servicio de facturación Toda la lógica de negocio: crear facturas, anularlas, generar el hash SHA-256 encadenado y la firma XAdES/XMLDSig que exige Verifactu. La librería node-forge o xmldsigjs te sirven para la firma. La remisión a la AEAT se hace vía su web service con certificado digital.
+Servicio LOPD/RGPD Capa separada que gestiona el cifrado de datos personales en reposo (crypto nativo de Node o libsodium), los consentimientos y el registro de auditoría de accesos. Importante que los logs de acceso a datos personales queden trazados.
+Cola de trabajos — BullMQ + Redis Imprescindible para la remisión asíncrona a la AEAT. Si la AEAT no responde en un momento dado, el job se reintenta automáticamente sin bloquear la API. BullMQ está construido específicamente para Node.js.
+Agente IA (opcional) Se engancha a la API como un cliente más. El agente interpreta lenguaje natural del usuario y lo traduce en llamadas a los endpoints de la API. Nunca toca los registros directamente — eso garantiza el cumplimiento normativo.
+Persistencia PostgreSQL para los registros de facturación (necesitas trazabilidad completa, relaciones y transacciones ACID). Redis para la cola y caché de sesiones. Un almacén de objetos tipo S3 o MinIO para guardar los XMLs firmados y los PDFs de facturas.
+Infraestructura Node.js 20 LTS en Docker, Nginx como reverse proxy terminando TLS, y el servidor en cloud europeo (obligatorio por RGPD — los datos deben residir en la UE). AWS Frankfurt, Google Cloud Madrid, OVHcloud o Hetzner en Alemania son opciones válidas.
+Sobre el servidor: sí necesitas uno dedicado o VPS. No puedes usar funciones serverless puras para esto porque Verifactu requiere que el sistema mantenga el estado de la cadena de hash entre facturas consecutivas.
